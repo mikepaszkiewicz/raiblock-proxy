@@ -7,7 +7,14 @@ app.get("/", (req, res) => {
   const blockData = req.body;
 
   for (const url in urls) {
-    axios.post(url, blockData);
+    axios
+      .post(url, blockData)
+      .then(res => {
+        console.log(res.data);
+      })
+      .catch(err => {
+        console.warn(err.message);
+      });
   }
 
   res
