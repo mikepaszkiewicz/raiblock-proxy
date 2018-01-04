@@ -1,6 +1,5 @@
 const express = require("express");
 const axios = require("axios");
-const bodyParser = require("body-parser");
 
 const app = express();
 
@@ -9,7 +8,18 @@ const urls = [
   "https://www.raidots.live/callback"
 ];
 
-app.use(bodyParser.json());
+app.use(function(req, res, next) {
+  var data = "";
+  req.setEncoding("utf8");
+  req.on("data", function(chunk) {
+    data += chunk;
+  });
+
+  req.on("end", function() {
+    req.body = JSON.parse(data);
+    next();
+  });
+});
 
 app.get("/", (req, res) => {
   res
@@ -18,7 +28,7 @@ app.get("/", (req, res) => {
     .end();
 });
 
-app.post("/", (req, res) => {
+app.post("/callback", (req, res) => {
   const blockData = req.data;
   //send looks like this, not sure if RPC returns stringified block or json?
   //   {
@@ -53,7 +63,7 @@ app.post("/", (req, res) => {
     .end();
 });
 
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
 });
